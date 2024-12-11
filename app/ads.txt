@@ -1,0 +1,4 @@
+google.com, pub-1234567890123456, DIRECT, f08c47fec0942fa0
+indexexchange.com, 987654, RESELLER, abc123def456
+rubiconproject.com, 1234567890, DIRECT, 5jy123y65er8
+appnexus.com, 7654321, RESELLER, 23dc34fa12df

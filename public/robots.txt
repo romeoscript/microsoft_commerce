@@ -1,0 +1,9 @@
+User-agent: *  # Applies to all web crawlers
+Disallow: /admin/  # Disallow crawling of the admin section
+Disallow: /login/  # Disallow crawling of the login page
+Disallow: /cart/  # Disallow crawling of the shopping cart
+Disallow: /checkout/  # Disallow crawling of the checkout page
+Allow: /  # Allow crawling of the entire site except those disallowed above
+
+# Sitemap URL (helps search engines find your sitemap)
+Sitemap: https://yourwebsite.com/sitemap.xml
