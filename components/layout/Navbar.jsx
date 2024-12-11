@@ -1,170 +1,222 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import Image from "next/image";
-import { FiMenu, FiX, FiShoppingCart, FiUser, FiLogOut, FiList } from "react-icons/fi";
-import Button from "../reusables/buttons/Button";
-import { useRouter, usePathname } from "next/navigation";
-import useCookies from "@/hooks/useCookies";
+import { FiSearch, FiShoppingCart, FiMenu, FiX } from "react-icons/fi";
 import { useSelector } from 'react-redux';
 
 const Navbar = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isAntivirusOpen, setIsAntivirusOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const totalQuantities = useSelector(state => state.cart.totalQuantities);
 
-  const router = useRouter();     
-  const pathname = usePathname(); // Get current route
-  const toggleSidebar = () => {
-    setIsOpen(!isOpen);
-  }
+  const antivirusItems = [
+    "Kaspersky",
+    "Norton",
+    "McAfee",
+    "Bitdefender",
+    "AVG"
+  ];
 
-  const toggleDropdown = () => {
-    setIsDropdownOpen(!isDropdownOpen);
-  }
+  // Handle scroll effect
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
-  const { getCookie, removeCookie } = useCookies();
-  
-  let euodia_token = getCookie("euodia_token");
-
-  useEffect(() => { }, [euodia_token]);
-
-  const handleLogout = () => {
-    removeCookie("euodia_token");
-    removeCookie("euodia_user");
-    router.push("/login");
-  };
+  // Close mobile menu on window resize
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > 768) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   return (
-    <nav className="bg-white shadow-md">
-      <div className="container mx-auto flex justify-between items-center p-4">
-        <Link href="/">
-          <div className="flex items-center">
-            <Image src="/logo.svg" alt="Euodia Logo" width={40} height={40} />
-            <span className="ml-2 text-md text-accent font-bold">
-              Euodia WholeFoods
-            </span>
-          </div>
-        </Link>
-        <div className="hidden md:flex items-center space-x-6">
-          <Link href="/" className={`hover:text-green-800 ${pathname === '/' ? 'text-green-600' : ''}`}>
-            Home
-          </Link>
-          <Link href="/menu" className={`hover:text-green-800 ${pathname === '/menu' ? 'text-green-600' : ''}`}>
-            Our Menu
-          </Link>
-          <Link href="/contact-us" className={`hover:text-green-800 ${pathname === '/contact-us' ? 'text-green-600' : ''}`}>
-            Contact us
-          </Link>
-          <div className="flex items-center space-x-4">
-            <Link href="/cart">
-              <button className="hover:text-green-800 relative">
-                <FiShoppingCart className="text-xl" />
-                {totalQuantities !== 0 && (
-                  <p className='absolute -top-2 right-0 bg-red h-4 w-4 text-white flex items-center justify-center p-1 text-sm rounded-full'>
-                    {totalQuantities}
-                  </p>
-                )}
-              </button>
-            </Link>
-            {euodia_token ? (
-              <div className="relative z-50">
-                <button onClick={toggleDropdown} className="hover:text-green-800">
-                  <FiUser className="h-5 w-5" />
-                </button>
-                {isDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-300 shadow-lg rounded-md py-2 z-10">
-                    <Link href="/order" className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100">
-                      <FiList className="mr-2" />
-                      My Orders
-                    </Link>
-                    <button onClick={handleLogout} className="flex items-center w-full px-4 py-2 text-gray-700 hover:bg-gray-100">
-                      <FiLogOut className="mr-2" />
-                      Logout
-                    </button>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <Button
-                color="black"
-                title="Login"
-                hoverAnimation={"bounce"}
-                isBorder
-                onClick={() => router.push("/login")}
-              />
-            )}
-          </div>
-        </div>
-        <div className="md:hidden flex items-center">
-          <Link href="/cart">
-            <button className="hover:text-green-800 relative">
-              <FiShoppingCart className="text-xl" />
-              {totalQuantities !== 0 && (
-                <p className='absolute -top-2 right-0 bg-red h-4 w-4 text-white flex items-center justify-center p-1 text-sm rounded-full'>
-                  {totalQuantities}
-                </p>
-              )}
-            </button>
-          </Link>
-          <button onClick={toggleSidebar} className="ml-4">
-            {isOpen ? (
-              <FiX className="h-6 w-6 text-green-600" />
-            ) : (
-              <FiMenu className="h-6 w-6 text-green-600" />
-            )}
-          </button>
+    <nav className={`bg-white w-full ${isScrolled ? 'fixed top-0 left-0 shadow-md z-50' : ''}`}>
+      {/* Top bar - Hidden on mobile */}
+      <div className="hidden sm:block bg-[#f8f8f8] py-2 px-4 text-sm">
+        <div className="container mx-auto flex flex-wrap justify-end space-x-4">
+          <Link href="/save-more" className="hover:text-orange-500">SAVE MORE ON APP</Link>
+          <Link href="/seller" className="hover:text-orange-500">BECOME A SELLER</Link>
+          <Link href="/support" className="hover:text-orange-500">HELP & SUPPORT</Link>
+          <Link href="/login" className="hover:text-orange-500">LOGIN</Link>
+          <Link href="/signup" className="hover:text-orange-500">SIGN UP</Link>
         </div>
       </div>
-      {isOpen && (
-        <div className="md:hidden z-99999 flex flex-col items-center bg-white shadow-lg p-4 space-y-4">
-          <Link href="/" className={`hover:text-green-800 ${pathname === '/' ? 'text-green-600' : ''}`} onClick={toggleSidebar}>
-            Home
-          </Link>
-          <Link href="/menu" className={`hover:text-green-800 ${pathname === '/menu' ? 'text-green-600' : ''}`} onClick={toggleSidebar}>
-            Our Menu
-          </Link>
-          <Link href="/contact-us" className={`hover:text-green-800 ${pathname === '/contact-us' ? 'text-green-600' : ''}`} onClick={toggleSidebar}>
-            Contact us
-          </Link>
-          <div className="flex flex-col items-center space-y-4 w-full">
-            {euodia_token ? (
-              <div className="relative w-full">
-                <button
-                  onClick={() => {
-                    toggleDropdown();
-                    toggleSidebar();
-                  }}
-                  className="flex items-center justify-center text-green-600 border border-green-600 rounded-lg px-4 py-2 w-full hover:bg-green-600 hover:text-white"
-                >
-                  <FiUser className="mr-2 h-5 w-5" />
-                  Account
-                </button>
-                {isDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-full bg-white border opacity-100 border-gray-300 shadow-lg rounded-md py-2 z-10">
-                    <Link href="/orders" className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100" onClick={toggleSidebar}>
-                      <FiList className="mr-2" />
-                      My Orders
-                    </Link>
-                    <button onClick={handleLogout} className="flex items-center w-full px-4 py-2 text-gray-700 hover:bg-gray-100">
-                      <FiLogOut className="mr-2" />
-                      Logout
-                    </button>
-                  </div>
-                )}
-              </div>
+
+      {/* Main navbar */}
+      <div className="container mx-auto py-4 px-4">
+        <div className="flex items-center justify-between">
+          {/* Mobile menu button */}
+          <button 
+            className="md:hidden p-2"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          >
+            {isMobileMenuOpen ? (
+              <FiX className="text-2xl" />
             ) : (
-              <Button
-                title="Login"
-                color="gray"
-                isBorder
-                onClick={() => {
-                  toggleSidebar();
-                  router.push("/login");
-                }}
-                className="w-full"
-              />
+              <FiMenu className="text-2xl" />
             )}
+          </button>
+
+          {/* Logo */}
+          <Link href="/" className="flex items-center space-x-2">
+            <span className="text-xl font-bold text-[#172b4d]">E-Software Shop</span>
+          </Link>
+
+          {/* Search bar - Hidden on mobile */}
+          <div className="hidden md:block flex-1 max-w-2xl mx-8">
+            <div className="relative">
+              <input 
+                type="text"
+                placeholder="Search in E-Software Shop"
+                className="w-full px-4 py-2 border border-gray-200 rounded-md focus:outline-none focus:border-gray-400"
+              />
+              <button className="absolute right-3 top-1/2 -translate-y-1/2">
+                <FiSearch className="text-gray-400 text-xl" />
+              </button>
+            </div>
+          </div>
+
+          {/* Cart */}
+          <Link href="/cart" className="relative">
+            <FiShoppingCart className="text-2xl" />
+            {totalQuantities > 0 && (
+              <span className="absolute -top-2 -right-2 bg-orange-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
+                {totalQuantities}
+              </span>
+            )}
+          </Link>
+        </div>
+
+        {/* Mobile Search - Visible only on mobile */}
+        <div className="md:hidden mt-4">
+          <div className="relative">
+            <input 
+              type="text"
+              placeholder="Search in E-Software Shop"
+              className="w-full px-4 py-2 border border-gray-200 rounded-md focus:outline-none focus:border-gray-400"
+            />
+            <button className="absolute right-3 top-1/2 -translate-y-1/2">
+              <FiSearch className="text-gray-400 text-xl" />
+            </button>
+          </div>
+        </div>
+
+        {/* Categories - Desktop */}
+        <div className="hidden md:flex items-center space-x-8 mt-4 text-sm">
+          <Link href="/" className="text-gray-700 hover:text-orange-500">
+            HOME
+          </Link>
+          <div 
+            className="relative group"
+            onMouseEnter={() => setIsAntivirusOpen(true)}
+            onMouseLeave={() => setIsAntivirusOpen(false)}
+          >
+            <button className="text-gray-700 hover:text-orange-500 flex items-center">
+              ANTIVIRUS
+              <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            {isAntivirusOpen && (
+              <div className="absolute left-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-50">
+                {antivirusItems.map((item, index) => (
+                  <Link
+                    key={index}
+                    href={`/antivirus/${item.toLowerCase()}`}
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    {item}
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+          <Link href="/windows" className="text-gray-700 hover:text-orange-500">
+            WINDOWS
+          </Link>
+          <Link href="/office" className="text-gray-700 hover:text-orange-500">
+            OFFICE
+          </Link>
+          <Link href="/server" className="text-gray-700 hover:text-orange-500">
+            SERVER
+          </Link>
+          <Link href="/other-software" className="text-gray-700 hover:text-orange-500">
+            OTHER SOFTWARE
+          </Link>
+        </div>
+      </div>
+
+      {/* Mobile Menu */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden border-t border-gray-200">
+          <div className="py-2 px-4 space-y-4">
+            <Link href="/" className="block text-gray-700 hover:text-orange-500">
+              HOME
+            </Link>
+            <div className="space-y-2">
+              <button 
+                className="flex items-center justify-between w-full text-gray-700 hover:text-orange-500"
+                onClick={() => setIsAntivirusOpen(!isAntivirusOpen)}
+              >
+                ANTIVIRUS
+                <svg className={`w-4 h-4 transform ${isAntivirusOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              {isAntivirusOpen && (
+                <div className="pl-4 space-y-2">
+                  {antivirusItems.map((item, index) => (
+                    <Link
+                      key={index}
+                      href={`/antivirus/${item.toLowerCase()}`}
+                      className="block text-sm text-gray-600 hover:text-orange-500"
+                    >
+                      {item}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+            <Link href="/windows" className="block text-gray-700 hover:text-orange-500">
+              WINDOWS
+            </Link>
+            <Link href="/office" className="block text-gray-700 hover:text-orange-500">
+              OFFICE
+            </Link>
+            <Link href="/server" className="block text-gray-700 hover:text-orange-500">
+              SERVER
+            </Link>
+            <Link href="/other-software" className="block text-gray-700 hover:text-orange-500">
+              OTHER SOFTWARE
+            </Link>
+            
+            {/* Mobile-only links */}
+            <div className="pt-4 border-t border-gray-200">
+              <Link href="/save-more" className="block text-gray-700 hover:text-orange-500">
+                SAVE MORE ON APP
+              </Link>
+              <Link href="/seller" className="block text-gray-700 hover:text-orange-500 mt-4">
+                BECOME A SELLER
+              </Link>
+              <Link href="/support" className="block text-gray-700 hover:text-orange-500 mt-4">
+                HELP & SUPPORT
+              </Link>
+              <Link href="/login" className="block text-gray-700 hover:text-orange-500 mt-4">
+                LOGIN
+              </Link>
+              <Link href="/signup" className="block text-gray-700 hover:text-orange-500 mt-4">
+                SIGN UP
+              </Link>
+            </div>
           </div>
         </div>
       )}
